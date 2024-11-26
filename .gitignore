@@ -1,3 +1,8 @@
+# Other files
+*.sln
+*.vscode
+Debug/*
+
 # Prerequisites
 *.d
 
