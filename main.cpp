@@ -4,7 +4,7 @@
 int main() 
 {
     Helper* helper = new Helper();
-    helper -> readLines();
+    std::string text = helper -> readInputFile(1);
 
-    std::cout << "hello c++" << std::endl;
+    std::cout << text; 
 }

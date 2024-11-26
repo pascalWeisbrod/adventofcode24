@@ -6,6 +6,7 @@ public:
     ~Helper(void);
    
     int readLines(void);
+    std::string readInputFile(int day);
 
 private:
     std::string read_file(std::string file_path);

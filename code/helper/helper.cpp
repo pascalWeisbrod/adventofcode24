@@ -4,8 +4,32 @@
 #include <fstream>  // For file handling
 #include <string>   // For using string
 
+
+
 Helper::Helper(){}
 Helper::~Helper(){}
+
+std::string Helper::readInputFile(int day)
+{
+    std::string currentPath = get_executing_input_file();
+    bool second = false;
+    int idx = 0;
+    for (int i = currentPath.length() - 1; i >= 0; i--)
+    {
+        idx = i;
+        if (currentPath.at(i) == '\\')
+        {
+            if (second)
+            {
+                break;
+            }
+            second = true;
+        }
+    }
+    std::string filePath = currentPath.substr(0, idx) + "\\inputs\\input" + std::to_string(day) + ".txt";
+    return read_file(filePath);
+}
+
 
 std::string Helper::read_file(std::string file_path) {
     std::ifstream file(file_path); // Open the file
@@ -17,8 +41,7 @@ std::string Helper::read_file(std::string file_path) {
     std::string text = "";
     std::string line;
     while (std::getline(file, line)) { // Read line by line
-        std::cout << line << std::endl; // Output the line to the console
-        text += line;
+        text += line + "\n";
     }
 
     file.close(); // Close the file
