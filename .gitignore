@@ -1,4 +1,5 @@
 # Other files
+*.pdb
 *.sln
 *.vscode
 Debug/*

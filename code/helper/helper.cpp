@@ -26,7 +26,7 @@ std::string Helper::readInputFile(int day)
             second = true;
         }
     }
-    std::string filePath = currentPath.substr(0, idx) + "\\inputs\\input" + std::to_string(day) + ".txt";
+    std::string filePath = "C:\\Users\\pe190\\Desktop\\GitHub\\aoc\\adventofcode24\\inputs\\input" + std::to_string(day) + ".txt";
     return read_file(filePath);
 }
 
