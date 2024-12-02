@@ -6,6 +6,35 @@
 
 using namespace std;
 
+int vectorIsSafe(vector<int> line)
+{
+    bool increasing = line[1] > line[0];
+    for (int j = 0; j < line.size() - 1; j++)
+    { 
+        int dif = line[j + 1] - line[j];
+        if ((increasing == dif < 0) || abs(dif) < 1 || abs(dif) > 3)
+        {
+            return j;   
+        }
+    }
+    return -1;
+}
+
+vector<int> copy(vector<int> v, int skippedIdx)
+{
+    vector<int> u;
+    for (int i = 0; i < v.size(); i++)
+    {
+        int value = v[i];
+        if (i == skippedIdx)
+        {
+            continue;
+        }
+        u.push_back(value);
+    }
+    return u;
+}
+
 void work(const string& input)
 {
     string inputText = input; 
@@ -32,22 +61,30 @@ void work(const string& input)
     cout << "Go!" << endl;
 
     int safeCount = 0;
+    int dampedSafeCount = 0;
     for (int i = 0; i < reportVector.size(); i++)
     {
-        bool isSafe = true;
-        bool increasing = reportVector[i][1] > reportVector[i][0];
-        for (int j = 0; j < reportVector[i].size() - 1; j++)
-        { 
-            int dif = reportVector[i][j + 1] - reportVector[i][j];
-            if ((increasing == dif < 0) || abs(dif) < 1 || abs(dif) > 3)
-            {
-                isSafe = false;
-                break;
-            }
-        }
+        int menaceIdx = vectorIsSafe(reportVector[i]);
+        bool isSafe = menaceIdx == -1;
         safeCount += isSafe;
+
+        if (isSafe)
+        {
+            dampedSafeCount += isSafe;
+            continue;
+        }
+
+        vector<int> a = copy(reportVector[i], menaceIdx - 1);
+        vector<int> b = copy(reportVector[i], menaceIdx);
+        vector<int> c = copy(reportVector[i], menaceIdx + 1);
+        if (vectorIsSafe(a) == -1 || vectorIsSafe(b) == -1 || vectorIsSafe(c) == -1)
+        {
+            dampedSafeCount++;
+        }
     }
 
 
     cout << "Safe count: " << safeCount << endl;
+    cout << "Damped Safe count: " << dampedSafeCount << endl;
 }
+
