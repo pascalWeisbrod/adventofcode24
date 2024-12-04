@@ -5,9 +5,10 @@
 using namespace std;
 
 const string xmas = "XMAS";
-bool xmasLineInDirection(vector<string> input, int x, int y, int dx, int dy)
+const string mas = "MAS";
+bool xmasLineInDirection(vector<string> input, string searchFor, int x, int y, int dx, int dy)
 {
-    for (int i = 0; i < xmas.size(); i++)
+    for (int i = 0; i < searchFor.size(); i++)
     {
         int x2 = x + i * dx;
         int y2 = y + i * dy;
@@ -15,7 +16,7 @@ bool xmasLineInDirection(vector<string> input, int x, int y, int dx, int dy)
         {
             return false;
         }
-        if (input[y2].at(x2) != xmas.at(i))
+        if (input[y2].at(x2) != searchFor.at(i))
         {
             return false;
         }
@@ -25,15 +26,29 @@ bool xmasLineInDirection(vector<string> input, int x, int y, int dx, int dy)
 int xmasLines(vector<string> input, int x, int y)
 {
     int count = 0;
-    count += xmasLineInDirection(input, x, y, 0, 1);
-    count += xmasLineInDirection(input, x, y, 0, -1);
-    count += xmasLineInDirection(input, x, y, 1, 0);
-    count += xmasLineInDirection(input, x, y, -1, 0);
-    count += xmasLineInDirection(input, x, y, -1, -1);
-    count += xmasLineInDirection(input, x, y, -1, 1);
-    count += xmasLineInDirection(input, x, y, 1, -1);
-    count += xmasLineInDirection(input, x, y, 1, 1);
+    count += xmasLineInDirection(input, xmas, x, y, 0, 1);
+    count += xmasLineInDirection(input, xmas, x, y, 0, -1);
+    count += xmasLineInDirection(input, xmas, x, y, 1, 0);
+    count += xmasLineInDirection(input, xmas, x, y, -1, 0);
+    count += xmasLineInDirection(input, xmas, x, y, -1, -1);
+    count += xmasLineInDirection(input, xmas, x, y, -1, 1);
+    count += xmasLineInDirection(input, xmas, x, y, 1, -1);
+    count += xmasLineInDirection(input, xmas, x, y, 1, 1);
     return count;
+}
+int masX(vector<string> input, int x, int y)
+{
+    int size = mas.size() - 1;
+    bool rd = xmasLineInDirection(input, mas, x, y, 1, 1);
+    bool ld = xmasLineInDirection(input, mas, x + size, y, -1, 1);
+    bool ru = xmasLineInDirection(input, mas, x, y + size, 1, -1);
+    bool lu = xmasLineInDirection(input, mas, x + size, y + size, -1, -1);
+    bool crossDown = rd && ld;
+    bool crossUp = ru && lu;
+    bool crossRight = rd && ru;
+    bool crossLeft = ld && lu;
+
+    return crossDown + crossUp + crossRight + crossLeft;
 }
 
 void work(const string& input)
@@ -50,14 +65,17 @@ void work(const string& input)
     cout << "Go!" << endl;
 
     int xmasCount = 0;
+    int masXCount = 0;
     
     for (int i = 0; i < lines.size(); i++)
     {
         for (int j = 0; j < lines[i].size(); j++)
         {
             xmasCount += xmasLines(lines, j, i);
+            masXCount += masX(lines, j, i);
         }
     }
     
-    cout << xmasCount << endl;
+    cout << "XMAS count found: " << xmasCount << endl;
+    cout << "MAS-X count found: " << masXCount << endl;
 }
