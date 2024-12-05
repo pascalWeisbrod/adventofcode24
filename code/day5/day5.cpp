@@ -6,7 +6,34 @@
 
 using namespace std;
 
-bool lineValue(map<int, vector<int>>* specs, map<int, vector<int>>* noSpecs, vector<int>* line)
+void sort(map<int, vector<int>>* noSpecs, vector<int>* line)
+{
+    for (int i = 0; i < (*line).size(); i++)
+    {
+        for (int j = 0; j < (*line).size() - 1; j++)
+        {
+            int first = (*line).at(j);
+            int second = (*line).at(j + 1);
+            bool contained = false;
+            
+            auto found = (*noSpecs).find(second);
+            if (found == (*noSpecs).end())
+            {
+                continue;
+            }
+            for (int v : found -> second)
+            {
+                if (v == first)
+                {
+                    (*line)[j] = second;
+                    (*line)[j + 1] = first;
+                }
+            }
+        }
+    }
+}
+
+bool lineValue(map<int, vector<int>>* noSpecs, vector<int>* line)
 {
     vector<int> shouldPass;
     vector<int> shouldNotPass;
@@ -22,13 +49,6 @@ bool lineValue(map<int, vector<int>>* specs, map<int, vector<int>>* noSpecs, vec
             }
         }
         shouldPass.erase(remove(shouldPass.begin(), shouldPass.end(), value), shouldPass.end());
-        if ((*specs).find(value) != (*specs).end())
-        {
-            for (int v : (*specs)[value])
-            {
-                shouldPass.push_back(v);
-            }
-        }
         if ((*noSpecs).find(value) != (*noSpecs).end())
         {
             for (int v : (*noSpecs)[value])
@@ -48,7 +68,6 @@ bool lineValue(map<int, vector<int>>* specs, map<int, vector<int>>* noSpecs, vec
 void work(const string& input)
 {
     string text = input;
-    map<int, vector<int>> specs;
     map<int, vector<int>> invertedSpecs;
     vector<vector<int>> updates;
     bool didSplit = false;
@@ -70,11 +89,6 @@ void work(const string& input)
             int l = stoi(line.substr(0, splitIdx));
             int r = stoi(line.substr(splitIdx + 1, line.size() - splitIdx - 1));
 
-            if (specs.find(l) == specs.end())
-            {
-                specs[l] = vector<int>({});
-            }
-            specs[l].push_back(r);
 
             if (invertedSpecs.find(r) == invertedSpecs.end())
             {
@@ -103,15 +117,19 @@ void work(const string& input)
     cout << "Go!" << endl;
 
     long correctOrderings = 0;
+    long wrongOrderings = 0;
 
     for (int i = 0; i < updates.size(); i++)
     {
-        bool lineIsGood = lineValue(&specs, &invertedSpecs, &(updates.at(i)));
+        bool lineIsGood = lineValue(&invertedSpecs, &(updates.at(i)));
         if (lineIsGood)
         {
             correctOrderings += updates.at(i)[updates.at(i).size() / 2];
+            continue;
         }
+        sort(&invertedSpecs, &(updates.at(i)));
+        wrongOrderings += updates.at(i)[updates.at(i).size() / 2];
     }
-
-    cout << "Middle Page Number Sum: " << correctOrderings << endl;
+    cout << "Correctly Ordered: " << correctOrderings << endl;
+    cout << "Wrongly: " << wrongOrderings << endl;
 }
