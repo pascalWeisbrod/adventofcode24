@@ -64,23 +64,21 @@ void work(const string& input)
     int direction[2] = { 0, 1 };
     int pos[2] = { found % lineLength, lineCount - 1 - (found / lineLength) };
 
-    map<string, bool> didFindPos;
+    unordered_set<string> didFindPos;
     unordered_set<string> obstacles;
 
     do    
     {
         string xy = to_string(pos[0]) + "," + to_string(pos[1]);
-        auto hit = didFindPos.find(xy);
-        if (hit == didFindPos.end())
-        {
-            didFindPos.insert({xy, true});
-        }
+        didFindPos.insert(xy);
+
+
         int next_x = pos[0] + direction[0];
         int next_y = pos[1] + direction[1];
         char dummy = getCharAtPos(&text, next_x, next_y);
-        if (dummy != '#')
+        int insertPos = text.size() - (next_y + 1) * lineLength + next_x;
+        if (dummy != '#' && insertPos != found)
         {
-            int insertPos = text.size() - (next_y + 1) * lineLength + next_x;
             text[insertPos] = '#';
             if (isInfiniteLoop(&text, pos[0], pos[1], direction[0], direction[1]))
             {
