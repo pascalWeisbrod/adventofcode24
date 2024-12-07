@@ -1,22 +1,19 @@
 #include <iostream>
 #include <string>
-#include <map>
 #include <unordered_set>
 
 using namespace std;
 
-char getCharAtPos(string* text, int x, int y)
+char getCharAtPos(vector<string>* text, int x, int y)
 {
-    int lineLength = text->find("\n") + 1;
-    int lineCount = text->size() / lineLength;
-    if (x < 0 || x >= lineLength || y < 0 || y >= lineCount)
+    if (x < 0 || x >= text -> at(0).size() || y < 0 || y >= text -> size())
     {
         return '.';
     }
-    return text->at(text -> size() - (y + 1) * lineLength + x);
+    return text -> at(y)[x];
 }
 
-void makeMove(string* text, int pos[], int dir[])
+void makeMove(vector<string>* text, int pos[], int dir[])
 {
     while (getCharAtPos(text, pos[0] + dir[0], pos[1] + dir[1]) != '.')
     {
@@ -29,12 +26,10 @@ void makeMove(string* text, int pos[], int dir[])
     pos[1] = pos[1] + dir[1];
 }
 
-bool isInfiniteLoop(string* text, int x, int y, int dx, int dy)
+bool isInfiniteLoop(vector<string>* text, int x, int y, int dx, int dy)
 {
     int pos[2] = { x, y };
     int dir[2] = { dx, dy };
-    int lineLength = text -> find("\n") + 1;
-    int lineCount = text -> size() / lineLength;
 
     unordered_set<string> moves;
     do    
@@ -48,58 +43,62 @@ bool isInfiniteLoop(string* text, int x, int y, int dx, int dy)
         moves.insert(xy);
         makeMove(text, pos, dir);
     }
-    while  (pos[0] >= 0 && pos[0] < lineLength && pos[1] >= 0 && pos[1] < lineCount);
+    while  (pos[0] >= 0 && pos[0] < text->at(0).size() && pos[1] >= 0 && pos[1] < text->size());
 
     return false;
 }
 void work(const string& input)
 {
     string text = input;
-    int lineLength = text.find("\n") + 1;
-    int lineCount = text.size() / lineLength;
-    int found = text.find("^");
-    text[found] = '.';
+    vector<string> lines;
+    int s_pos[2];
+    while (text.size() > 0)
+    {
+        int ll = text.find("\n");
+        string line = text.substr(0, ll);
+        text.erase(0, ll + 1);
+
+        int idx = line.find("^");
+        if (idx != -1)
+        {
+            s_pos[0] = idx;
+            s_pos[1] = lines[0].size() - lines.size() - 1;
+            line[idx] = '.';
+        }
+        lines.insert(lines.begin(), line);
+    }
 
     cout << "Go!" << endl;
 
     int direction[2] = { 0, 1 };
-    int pos[2] = { found % lineLength, lineCount - 1 - (found / lineLength) };
-
-    int startPos[2] = { found % lineLength, lineCount - 1 - (found / lineLength) };
+    int pos[2] = { s_pos[0], s_pos[1] };
 
     unordered_set<string> didFindPos;
     unordered_set<string> obstacles;
-
+int i = 0;
     do    
     {
         string xy = to_string(pos[0]) + "," + to_string(pos[1]);
         didFindPos.insert(xy);
 
-        makeMove(&text, pos, direction);
-    }
-    while  (pos[0] >= 0 && pos[0] < lineLength && pos[1] >= 0 && pos[1] < lineCount);
+        makeMove(&lines, pos, direction);
 
-    int infinities = 0;
-    for (int i = 0; i < text.size(); i++)
-    {
-        int x = i % lineLength;
-        int y = lineCount - 1 - (i / lineLength);
-        char dummy = getCharAtPos(&text, x, y);
-        if (dummy == '\n')
+        if (!(pos[0] >= 0 && pos[0] < lines[0].size() && pos[1] >= 0 && pos[1] < lines.size()))
         {
-            continue;
+            break;
         }
-        int insertPos = text.size() - (y + 1) * lineLength + x;
-        text[insertPos] = '#';
-        if (dummy != '#' && insertPos != found)
+
+        lines[pos[1]].at(pos[0]) = '#';
+
+        if (isInfiniteLoop(&lines, s_pos[0], s_pos[1], 0, 1))
         {
-            if (isInfiniteLoop(&text, startPos[0], startPos[1], 0, 1))
-            {
-                infinities++;
-            }
+            xy = to_string(pos[0]) + "," + to_string(pos[1]);
+            obstacles.insert(xy);
         }
-        text[insertPos] = dummy;
+        lines[pos[1]].at(pos[0]) = '.';
     }
+    while  (pos[0] >= 0 && pos[0] < lines[0].size() && pos[1] >= 0 && pos[1] < lines.size());
+
     cout << "Distinct positions: " << didFindPos.size() << endl;
-    cout << "Positions to create a loop: " << infinities << endl;
+    cout << "Positions to create a loop: " << obstacles.size() << endl;
 }
