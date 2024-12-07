@@ -40,6 +40,7 @@ bool isInfiniteLoop(string* text, int x, int y, int dx, int dy)
     do    
     {
         string xy = to_string(pos[0]) + "," + to_string(pos[1]) + "," + to_string(dir[0]) + to_string(dir[1]);
+
         if (moves.find(xy) != moves.end())
         {
             return true;
@@ -64,6 +65,8 @@ void work(const string& input)
     int direction[2] = { 0, 1 };
     int pos[2] = { found % lineLength, lineCount - 1 - (found / lineLength) };
 
+    int startPos[2] = { found % lineLength, lineCount - 1 - (found / lineLength) };
+
     unordered_set<string> didFindPos;
     unordered_set<string> obstacles;
 
@@ -72,24 +75,31 @@ void work(const string& input)
         string xy = to_string(pos[0]) + "," + to_string(pos[1]);
         didFindPos.insert(xy);
 
-
-        int next_x = pos[0] + direction[0];
-        int next_y = pos[1] + direction[1];
-        char dummy = getCharAtPos(&text, next_x, next_y);
-        int insertPos = text.size() - (next_y + 1) * lineLength + next_x;
-        if (dummy != '#' && insertPos != found)
-        {
-            text[insertPos] = '#';
-            if (isInfiniteLoop(&text, pos[0], pos[1], direction[0], direction[1]))
-            {
-                obstacles.insert(to_string(next_x) + "," + to_string(next_y));
-            }
-            text[insertPos] = dummy;
-        }
         makeMove(&text, pos, direction);
     }
     while  (pos[0] >= 0 && pos[0] < lineLength && pos[1] >= 0 && pos[1] < lineCount);
 
+    int infinities = 0;
+    for (int i = 0; i < text.size(); i++)
+    {
+        int x = i % lineLength;
+        int y = lineCount - 1 - (i / lineLength);
+        char dummy = getCharAtPos(&text, x, y);
+        if (dummy == '\n')
+        {
+            continue;
+        }
+        int insertPos = text.size() - (y + 1) * lineLength + x;
+        text[insertPos] = '#';
+        if (dummy != '#' && insertPos != found)
+        {
+            if (isInfiniteLoop(&text, startPos[0], startPos[1], 0, 1))
+            {
+                infinities++;
+            }
+        }
+        text[insertPos] = dummy;
+    }
     cout << "Distinct positions: " << didFindPos.size() << endl;
-    cout << "Positions to create a loop: " << obstacles.size() << endl;
+    cout << "Positions to create a loop: " << infinities << endl;
 }
