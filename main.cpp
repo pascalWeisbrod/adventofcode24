@@ -1,7 +1,7 @@
 #include <iostream>
 #include <chrono>
-#include "code/helper/helper.h"
-#include "code/day1/day1.h"
+#include "helper/helper.h"
+#include "day.h"
 
 int main() 
 {
