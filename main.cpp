@@ -6,7 +6,7 @@
 int main() 
 {
     Helper* helper = new Helper();
-    std::string text = helper -> readInputFile(7);
+    std::string text = helper -> readInputFile(8);
 
     auto timeBefore = std::chrono::system_clock::now();
 
