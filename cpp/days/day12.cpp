@@ -61,6 +61,65 @@ int getPerimiter(vector<string>* lines, vector<Point>* points)
     return perimiter;
 }
 
+Point followSide(vector<string>* lines, Point startPoint, Point direction, char plant)
+{
+    Point lookDirection(direction.y, direction.x * -1);
+    Point current(startPoint.x, startPoint.y);
+    while (getCharAt(lines, current.x, current.y) == plant && getCharAt(lines, current.x + lookDirection.x, current.y + lookDirection.y) != plant)
+    {
+        current.x++;
+        current.y++;
+    }
+    return current;
+}
+
+int fillSides(vector<string>* lines, vector<Point>* points)
+{
+    Point startPoint = points -> at(0);
+    char plant = getCharAt(lines, startPoint.x, startPoint.y);
+    while (getCharAt(lines, startPoint.x, startPoint.y - 1) == plant)
+        startPoint.y--;
+
+    Point pos(startPoint.x, startPoint.y);
+    Point dir(-1, 0);
+    int count = 0;
+
+    unordered_set<string> visited;
+    int lastSize = 0;
+
+    do
+    {
+        string hash = to_string(pos.x) + "," + to_string(pos.y) + "," + to_string(dir.x) + "," + to_string(dir.y);
+        visited.insert(hash);
+        if (visited.size() == lastSize)
+            break;
+        lastSize = visited.size();
+        
+        Point forward(pos.x + dir.x, pos.y + dir.y);
+
+        if (getCharAt(lines, forward.x, forward.y) == plant)
+        {
+            pos.x = forward.x;
+            pos.y = forward.y;
+        }
+
+        Point left(pos.x + dir.y * -1, pos.y + dir.x);
+        Point right(pos.x + dir.y, pos.y + dir.x * -1);
+
+        if (getCharAt(lines, left.x, left.y) == plant)
+        {
+            dir = Point(dir.y * -1, dir.x);
+            count++;
+        }
+        else if (getCharAt(lines, forward.x, forward.y) != plant)
+        {
+            dir = Point(dir.y, dir.x * -1);
+            count++;
+        }
+    } while (true);
+    return count;
+}
+
 void fillField(vector<string>* lines, unordered_set<string>* explored, Field* field, int x, int y)
 {
     string hash = to_string(x) + "," + to_string(y);
@@ -96,6 +155,7 @@ void work(const string& input)
     unordered_set<string> explored;
 
     int price = 0;
+    int discountedPrice = 0;
     for (int i = 0; i < lines.size(); i ++)
     {
         for (int j = 0; j < lines[0].size(); j++)
@@ -106,11 +166,12 @@ void work(const string& input)
                 continue;
             int area = f.points.size();
             int perimiter = getPerimiter(&lines, &f.points);
-            int field_prize = area * perimiter;
-            cout << "Plant " << f.plant << ": Area " << area << ", Perimiter " << perimiter << endl; 
+            int sides = fillSides(&lines, &f.points);
             price += area * perimiter;
+            discountedPrice += area * sides;
         }
     }
 
     cout << "Price: " << price << endl;
+    cout << "Discounted Price: " << discountedPrice << endl;
 }
