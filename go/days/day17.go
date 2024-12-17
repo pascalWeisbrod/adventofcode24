@@ -46,14 +46,14 @@ func Day17C1(input string) string {
             registers[1] = combo % 8 
             break
         case 3:
-            combo := 3
+            //combo := 3
             if registers[0] == 0 {
                 break
             }
             i = registers[0] - 1
             break
         case 4:
-            combo := registers[0]
+            //combo := registers[0]
             registers[1] = xor(registers[1], registers[2]) 
             break
         case 5:
@@ -83,7 +83,7 @@ func Day17C1(input string) string {
 
 
 func xor(a int, b int) int {
-    length := int(math.Ceil(math.Log2(float64(a))))
+    length := int(math.Log2(float64(a))) + 1
     value := 0
     for j := 0; j < length; j++ {
         bb := (a & 2 ^ j) != 0
