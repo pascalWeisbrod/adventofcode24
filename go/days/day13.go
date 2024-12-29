@@ -28,9 +28,6 @@ func secondMashine(a xy, b xy, prize xy) int {
     y := math.Round((float64(prize.y) - factor * float64(prize.x)) / (float64(b.y) - factor * float64(b.x)))
     x := math.Round((float64(prize.x) - float64(b.x) * y) / float64(a.x))
 
-    fmt.Println(x)
-    fmt.Println(y)
-
     if math.Floor(x) == x && math.Floor(y) == y {
         if a.x * int(x) + b.x * int(y) == prize.x && a.y * int(x) + b.y * int(y) == prize.y {
             return 3 * int(x) + int(y)
