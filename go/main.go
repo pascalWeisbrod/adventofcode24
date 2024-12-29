@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-    input := GetInput(17)
-    fmt.Println("Result: " + days.Day17C1(input))
+    input := GetInput(13)
+    fmt.Println("Result: " + days.Day13Part1(input))
 }
